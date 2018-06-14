@@ -2,6 +2,14 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.antfortune.freeline'
 
 android {
+    signingConfigs {
+        c {
+            keyAlias '青岛卓尔软件开发有限公司'
+            keyPassword 'zrsoft'
+            storeFile file('E:/Documents/zrsoft.keystore')
+            storePassword 'zrsoft'
+        }
+    }
     compileSdkVersion 27
     defaultConfig {
         applicationId "com.silencedut.knowweather"
@@ -29,13 +37,10 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-    }
-    applicationVariants.all { variant ->
-        variant.outputs.each { output ->
-            output.outputFileName = new File(
-                    output.outputFile.getParent(),
-                    "knowweather.apk".toLowerCase())
+            debuggable true
+            jniDebuggable true
+            signingConfig signingConfigs.c
+            renderscriptDebuggable true
         }
     }
     buildToolsVersion '27.0.3'

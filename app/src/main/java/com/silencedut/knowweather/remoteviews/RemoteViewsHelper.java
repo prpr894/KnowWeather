@@ -6,6 +6,7 @@ package com.silencedut.knowweather.remoteviews;
 
 import android.annotation.TargetApi;
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -39,7 +40,7 @@ public class RemoteViewsHelper {
 
         WeatherData weatherData = WeatherRepository.getInstance().getCachedWeatherData();
 
-        if(weatherData == null) {
+        if (weatherData == null) {
             return;
         }
 
@@ -48,7 +49,6 @@ public class RemoteViewsHelper {
         if (!show) {
             return;
         }
-
         Notification notification = RemoteViewsHelper.generateCustomNotification(service);
         service.startForeground(NOTICE_ID_TYPE_0, notification);// 开始前台服务
     }
@@ -57,20 +57,20 @@ public class RemoteViewsHelper {
 
         WeatherData weatherData = WeatherRepository.getInstance().getCachedWeatherData();
 
-        if(weatherData == null) {
+        if (weatherData == null) {
             return;
         }
 
 
         boolean show = PreferencesHelper.get(ResourceProvider.NOTIFICATION_ALLOW, true);
-        if (!show||service==null) {
+        if (!show || service == null) {
             return;
         }
         try {
             Field mBase = ContextWrapper.class.getDeclaredField("mBase");
             mBase.setAccessible(true);
             Context context = (Context) mBase.get(service);
-            if(context==null) {
+            if (context == null) {
                 return;
             }
         } catch (NoSuchFieldException e) {
@@ -94,6 +94,7 @@ public class RemoteViewsHelper {
     }
 
     public static void stopAlarm(Service service) {
+
         NotificationManager notificationManager = (NotificationManager) service.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancel(NOTICE_ID_TYPE_ALARM);
     }
@@ -121,20 +122,38 @@ public class RemoteViewsHelper {
 
     @TargetApi(16)
     private static Notification generateCustomNotification(Context context) {
+        NotificationCompat.Builder builder;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            builder = new NotificationCompat
+                    .Builder(context, "1")
+                    .setContent(getNotificationContentView(context))
+                    .setPriority(NotificationCompat.PRIORITY_MAX).setOngoing(true);
+            String channelID = "1";
 
-        NotificationCompat.Builder
-                builder =  new NotificationCompat
-                .Builder(context)
-                .setContent(getNotificationContentView(context))
-                .setPriority(NotificationCompat.PRIORITY_MAX).setOngoing(true);
+            String channelName = "channel_name";
+
+            NotificationChannel channel = new NotificationChannel(channelID, channelName, NotificationManager.IMPORTANCE_HIGH);
+
+            NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+            manager.createNotificationChannel(channel);
+
+            builder.setChannelId(channelID);
+
+        } else {
+
+            builder = new NotificationCompat
+                    .Builder(context)
+                    .setContent(getNotificationContentView(context))
+                    .setPriority(NotificationCompat.PRIORITY_MAX).setOngoing(true);
+        }
+
 
         if (Version.buildVersion() >= Build.VERSION_CODES.LOLLIPOP) {
             builder.setSmallIcon(R.mipmap.weather_small_icon);
         } else {
             builder.setSmallIcon(R.mipmap.core_icon);
         }
-
-
         Notification notification = builder.build();
         //wrap_content fit
         if (Version.buildVersion() >= Build.VERSION_CODES.JELLY_BEAN) {
@@ -148,8 +167,6 @@ public class RemoteViewsHelper {
 
     private static RemoteViews getNotificationContentView(Context context) {
 
-
-
         int themeId = ResourceProvider.getNotificationThemeId(PreferencesHelper.get(ResourceProvider.NOTIFICATION_THEME, 1));
 
         RemoteViews remoteViews = new RemoteViews(context.getPackageName(), themeId);
@@ -161,7 +178,7 @@ public class RemoteViewsHelper {
 
         WeatherData weatherData = WeatherRepository.getInstance().getCachedWeatherData();
 
-        if(weatherData == null) {
+        if (weatherData == null) {
             return remoteViews;
         }
 

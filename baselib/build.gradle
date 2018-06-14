@@ -26,9 +26,9 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    testApi 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.12'
 
-    androidTestApi 'com.android.support.test.espresso:espresso-core:3.0.1'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 
     // api library , can be used in import module
     api "com.android.support:appcompat-v7:$gradle.supportVersion"
@@ -44,7 +44,7 @@ dependencies {
     api "com.squareup.retrofit2:converter-gson:$gradle.retrofit2"
 
 
-    debugApi "com.squareup.leakcanary:leakcanary-android:$gradle.leakcanary"
+    debugImplementation "com.squareup.leakcanary:leakcanary-android:$gradle.leakcanary"
     releaseApi "com.squareup.leakcanary:leakcanary-android-no-op:$gradle.leakcanary"
 
     api "com.tencent.bugly:crashreport_upgrade:$gradle.bugly_crashreport_upgrade"
