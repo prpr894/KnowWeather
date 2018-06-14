@@ -6,7 +6,7 @@ android {
         c {
             keyAlias '青岛卓尔软件开发有限公司'
             keyPassword 'zrsoft'
-            storeFile file('E:/Documents/zrsoft.keystore')
+            storeFile file('../zrsoft.keystore')
             storePassword 'zrsoft'
         }
     }
